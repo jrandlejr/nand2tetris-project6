@@ -25,3 +25,8 @@ JUMP_TABLE = {
     "JLE": "110",
     "JMP": "111"
 }
+
+COMP_TABLE = {
+    
+}
+
