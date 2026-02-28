@@ -58,5 +58,58 @@ COMP_TABLE = {
 }
 
 
+import sys
+
+if len(sys.argv) != 2:
+    print("Usage: python assembler.py Add.asm")
+    sys.exit(1)
+
+input_filename = sys.argv[1]
+dot_at = input_filename.rfind('.')
+output_filename = f"{input_filename[:dot_at]}.lines"
+
+
+# Symbol table 
+symbol_table = {
+    "SP": 0,
+    "LCL": 1,
+    "ARG": 2,
+    "THIS": 3,
+    "THAT": 4,
+    # R0 to R15
+}
+for i in range(16):
+    symbol_table[f"R{i}"] = i
+
+symbol_table["SCREEN"] = 16384
+symbol_table["KBD"]    = 24576
+
+rom_address = 0  # current instruction address
+
+with open(input_filename, 'r') as file_in:
+    with open(output_filename, 'w') as file_out:
+        for raw_line in file_in:
+            line = raw_line.strip()
+
+           
+            if not line or line.startswith('//'):
+                continue
+
+            if line.startswith('(') and line.endswith(')'):
+                label = line[1:-1].strip()
+                if label in symbol_table:
+                    print(f"Warning: duplicate label '{label}'")
+                else:
+                    symbol_table[label] = rom_address
+                file_out.write(f"LABEL: {label} → address {rom_address}\n")
+             
+                continue
+
+           
+            file_out.write(f"{rom_address:3d}: {line}\n")
+            rom_address += 1
+
+
+
 
 
